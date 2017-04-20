@@ -1,7 +1,9 @@
 package org.xuxiaoxiao.firebasepagination;
 
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<ChatMessage> arrayList = new ArrayList<>();
     private Query query;
     private ChildEventListener childEventListener;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
 
     @Override
@@ -42,14 +45,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                String lastkey = arrayList.get(0).getMessageID();
-                arrayList.clear();
-                Log.d("WQWQ", lastkey + "__lastKey");
-                Log.d("WQWQ", "+-+-+-+-+-+-+-+-+-+-+");
-                query.removeEventListener(childEventListener);
-                query = mWilddogRef.orderByKey().endAt(lastkey).limitToLast(21);
-                query.addChildEventListener(childEventListener);
-
+                pageUp();
             }
         });
         pageDown = (Button) findViewById(R.id.page_down);
@@ -61,15 +57,32 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("WQWQ", lastkey + "__lastKey");
                 Log.d("WQWQ", "+-+-+-+-+-+-+-+-+-+-+");
                 query.removeEventListener(childEventListener);
-                query = mWilddogRef.orderByKey().startAt(lastkey).limitToFirst(21);
+                query = mWilddogRef.orderByKey().startAt(lastkey).limitToFirst(11);
                 query.addChildEventListener(childEventListener);
             }
         });
 
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    swipeRefreshLayout.setRefreshing(true);
+                    pageUp();
+                }
+            });
+            swipeRefreshLayout.setColorSchemeColors(
+                    Color.parseColor("#FF00DDFF"),
+                    Color.parseColor("#FF99CC00"),
+                    Color.parseColor("#FFFFBB33"),
+                    Color.parseColor("#FFFF4444")
+            );
+        }
+
         WilddogOptions wilddogOptions = new WilddogOptions.Builder().setSyncUrl("https://xuxiaoxiao1314.wilddogio.com").build();
         wilddogApp = WilddogApp.initializeApp(this, wilddogOptions);
         mWilddogRef = WilddogSync.getInstance().getReference().child("chat");
-        query = mWilddogRef.limitToLast(21);
+        query = mWilddogRef.limitToLast(11);
         childEventListener = new ChildEventListener() {
 
             @Override
@@ -102,6 +115,16 @@ public class MainActivity extends AppCompatActivity {
 
             }
         };
+        query.addChildEventListener(childEventListener);
+    }
+
+    private void pageUp() {
+        String lastkey = arrayList.get(0).getMessageID();
+        arrayList.clear();
+//                Log.d("WQWQ", lastkey + "__lastKey");
+//                Log.d("WQWQ", "+-+-+-+-+-+-+-+-+-+-+");
+        query.removeEventListener(childEventListener);
+        query = mWilddogRef.orderByKey().endAt(lastkey).limitToLast(11);
         query.addChildEventListener(childEventListener);
     }
 
