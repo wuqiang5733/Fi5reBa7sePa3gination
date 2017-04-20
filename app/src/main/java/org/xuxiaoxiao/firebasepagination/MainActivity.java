@@ -1,8 +1,8 @@
 package org.xuxiaoxiao.firebasepagination;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -111,7 +111,10 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
+//        recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
+        Drawable divider = getResources().getDrawable(R.drawable.item_divider);
+
+        recyclerView.addItemDecoration(new HorizontalDividerItemDecoration(divider));
         contentAdapter = new ContentAdapter(arrayList);
         recyclerView.setAdapter(contentAdapter);
     }
