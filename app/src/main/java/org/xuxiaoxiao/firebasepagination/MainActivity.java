@@ -2,6 +2,7 @@ package org.xuxiaoxiao.firebasepagination;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -40,12 +41,13 @@ public class MainActivity extends AppCompatActivity {
         pageUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 String lastkey = arrayList.get(0).getMessageID();
                 arrayList.clear();
                 Log.d("WQWQ", lastkey + "__lastKey");
                 Log.d("WQWQ", "+-+-+-+-+-+-+-+-+-+-+");
                 query.removeEventListener(childEventListener);
-                query = mWilddogRef.orderByKey().endAt(lastkey).limitToLast(6);
+                query = mWilddogRef.orderByKey().endAt(lastkey).limitToLast(21);
                 query.addChildEventListener(childEventListener);
 
             }
@@ -54,19 +56,20 @@ public class MainActivity extends AppCompatActivity {
         pageDown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String lastkey = arrayList.get(5).getMessageID();
+                String lastkey = arrayList.get(arrayList.size()-1).getMessageID();
                 arrayList.clear();
                 Log.d("WQWQ", lastkey + "__lastKey");
                 Log.d("WQWQ", "+-+-+-+-+-+-+-+-+-+-+");
                 query.removeEventListener(childEventListener);
-                query = mWilddogRef.orderByKey().startAt(lastkey).limitToFirst(6);
+                query = mWilddogRef.orderByKey().startAt(lastkey).limitToFirst(21);
                 query.addChildEventListener(childEventListener);
             }
         });
+
         WilddogOptions wilddogOptions = new WilddogOptions.Builder().setSyncUrl("https://xuxiaoxiao1314.wilddogio.com").build();
         wilddogApp = WilddogApp.initializeApp(this, wilddogOptions);
         mWilddogRef = WilddogSync.getInstance().getReference().child("chat");
-        query = mWilddogRef.limitToLast(6);
+        query = mWilddogRef.limitToLast(21);
         childEventListener = new ChildEventListener() {
 
             @Override
@@ -108,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         contentAdapter = new ContentAdapter(arrayList);
         recyclerView.setAdapter(contentAdapter);
     }
@@ -129,6 +133,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(ContentViewHolder holder, int position) {
             holder.messageTextView.setText(arrayList.get(position + 1).getMessage());
+            holder.messageId.setText(arrayList.get(position+1).getMessageID());
+            Log.d("WQWQ",String.valueOf(position));
         }
 
         @Override
@@ -140,10 +146,12 @@ public class MainActivity extends AppCompatActivity {
 
     private class ContentViewHolder extends RecyclerView.ViewHolder {
         TextView messageTextView;
+        TextView messageId;
 
         public ContentViewHolder(View itemView) {
             super(itemView);
             messageTextView = (TextView) itemView.findViewById(R.id.message);
+            messageId = (TextView)itemView.findViewById(R.id.id);
         }
     }
 }
