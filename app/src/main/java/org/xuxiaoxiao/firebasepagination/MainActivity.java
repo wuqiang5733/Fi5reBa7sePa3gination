@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         pageDown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String lastkey = arrayList.get(arrayList.size()-1).getMessageID();
+                String lastkey = arrayList.get(arrayList.size() - 1).getMessageID();
                 arrayList.clear();
 //                Log.d("WQWQ", lastkey + "__lastKey");
 //                Log.d("WQWQ", "+-+-+-+-+-+-+-+-+-+-+");
@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
             swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                 @Override
                 public void onRefresh() {
-                    Log.d("MainActivity_","onRefresh");
+                    Log.d("MainActivity_", "onRefresh");
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
                             pageUp();
 
                         }
-                    },1000);
+                    }, 1000);
                 }
             });
             swipeRefreshLayout.setColorSchemeColors(
@@ -150,30 +150,47 @@ public class MainActivity extends AppCompatActivity {
         contentAdapter = new ContentAdapter(arrayList);
         recyclerView.setAdapter(contentAdapter);
         recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-            int firstVisibleItem, visibleItemCount, totalItemCount;
-            int visibleThreshold = 1;
-            boolean isMoreLoading = false;
+            int ydy = 0;
+
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
+                Log.d("WQWQ", "onScrollStateChanged : " + String.valueOf(newState));
             }
 
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
+                int firstVisibleItem, visibleItemCount, totalItemCount, lastCompletelyVisibleItemPosition;
+                int offset = dy - ydy;
+                ydy = dy;
+//                Log.d("WQWQ", "offset : " + String.valueOf(offset));
+//                Log.d("WQWQ", "recyclerView.getScrollState() : " + String.valueOf(recyclerView.getScrollState()));
+                boolean shouldRefresh = (linearLayoutManager.findFirstCompletelyVisibleItemPosition() == 0)
+                        && (recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_DRAGGING) && offset > 15;
+                if (shouldRefresh) {
+                    //swipeRefreshLayout.setRefreshing(true);
+                    //Refresh to load data here.
+                    Log.d("WQWQ", "上上");
+                    return;
+                }
+                boolean shouldPullUpRefresh = linearLayoutManager.findLastCompletelyVisibleItemPosition() == linearLayoutManager.getChildCount() - 1
+                        && recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_DRAGGING && offset < -30;
+                if (shouldPullUpRefresh) {
+                    //swipeRefreshLayout.setRefreshing(true);
+                    //refresh to load data here.
+                    Log.d("WQWQ", "下下");
+                    return;
+                }
+                swipeRefreshLayout.setRefreshing(false);
+
                 visibleItemCount = recyclerView.getChildCount();
                 totalItemCount = linearLayoutManager.getItemCount();
                 firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
-
-                        Log.d("WQWQ","visibleItemCount？" + String.valueOf(visibleItemCount));
-                        Log.d("WQWQ","totalItemCount？" + String.valueOf(totalItemCount));
-                        Log.d("WQWQ","firstVisibleItem？" + String.valueOf(firstVisibleItem));
-                        Log.d("WQWQ","dx  " + String.valueOf(dx));
-                        Log.d("WQWQ","dy  " + String.valueOf(dy));
-                        Log.d("WQWQ","====================================");
-
-                    isMoreLoading = true;
-
+                lastCompletelyVisibleItemPosition = linearLayoutManager.findLastCompletelyVisibleItemPosition();
+//                if ((visibleItemCount + firstVisibleItem) == totalItemCount){
+                    Log.d("WQWQ", "lastCompletelyVisibleItemPosition : " + String.valueOf(lastCompletelyVisibleItemPosition));
+//                }
             }
         });
     }
@@ -195,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(ContentViewHolder holder, int position) {
             holder.messageTextView.setText(arrayList.get(position + 1).getMessage());
-            holder.messageId.setText(arrayList.get(position+1).getMessageID());
+            holder.messageId.setText(arrayList.get(position + 1).getMessageID());
 //            Log.d("WQWQ",String.valueOf(position));
         }
 
@@ -213,20 +230,18 @@ public class MainActivity extends AppCompatActivity {
         public ContentViewHolder(View itemView) {
             super(itemView);
             messageTextView = (TextView) itemView.findViewById(R.id.message);
-            messageId = (TextView)itemView.findViewById(R.id.id);
+            messageId = (TextView) itemView.findViewById(R.id.id);
         }
     }
     /**
      * recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
      int ydy = 0;
-     @Override
-     public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+     @Override public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
      super.onScrollStateChanged(recyclerView, newState);
 
      }
 
-     @Override
-     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+     @Override public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
      super.onScrolled(recyclerView, dx, dy);
      int offset = dy - ydy;
      ydy = dy;
