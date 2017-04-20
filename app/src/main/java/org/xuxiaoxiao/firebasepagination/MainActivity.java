@@ -168,6 +168,8 @@ public class MainActivity extends AppCompatActivity {
                         Log.d("WQWQ","visibleItemCount？" + String.valueOf(visibleItemCount));
                         Log.d("WQWQ","totalItemCount？" + String.valueOf(totalItemCount));
                         Log.d("WQWQ","firstVisibleItem？" + String.valueOf(firstVisibleItem));
+                        Log.d("WQWQ","dx  " + String.valueOf(dx));
+                        Log.d("WQWQ","dy  " + String.valueOf(dy));
                         Log.d("WQWQ","====================================");
 
                     isMoreLoading = true;
@@ -214,4 +216,36 @@ public class MainActivity extends AppCompatActivity {
             messageId = (TextView)itemView.findViewById(R.id.id);
         }
     }
+    /**
+     * recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+     int ydy = 0;
+     @Override
+     public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+     super.onScrollStateChanged(recyclerView, newState);
+
+     }
+
+     @Override
+     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+     super.onScrolled(recyclerView, dx, dy);
+     int offset = dy - ydy;
+     ydy = dy;
+     boolean shouldRefresh = (linearLayoutManager.findFirstCompletelyVisibleItemPosition() == 0)
+     && (recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_DRAGGING) && offset > 30;
+     if (shouldRefresh) {
+     //swipeRefreshLayout.setRefreshing(true);
+     //Refresh to load data here.
+     return;
+     }
+     boolean shouldPullUpRefresh = linearLayoutManager.findLastCompletelyVisibleItemPosition() == linearLayoutManager.getChildCount() - 1
+     && recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_DRAGGING && offset < -30;
+     if (shouldPullUpRefresh) {
+     //swipeRefreshLayout.setRefreshing(true);
+     //refresh to load data here.
+     return;
+     }
+     swipeRefreshLayout.setRefreshing(false);
+     }
+     });
+     */
 }
