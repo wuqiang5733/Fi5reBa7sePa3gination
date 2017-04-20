@@ -150,46 +150,53 @@ public class MainActivity extends AppCompatActivity {
         contentAdapter = new ContentAdapter(arrayList);
         recyclerView.setAdapter(contentAdapter);
         recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-            int ydy = 0;
+            int i = 0;
+            int firstVisibleItem, visibleItemCount, totalItemCount, lastCompletelyVisibleItemPosition;
 
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                Log.d("WQWQ", "onScrollStateChanged : " + String.valueOf(newState));
+                if((totalItemCount - lastCompletelyVisibleItemPosition) == 1){
+                    if(i++ == 3){
+                        Log.d("WQWQ","可以了");
+                    }
+                    return;
+                }
+                i = 0;
             }
 
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                int firstVisibleItem, visibleItemCount, totalItemCount, lastCompletelyVisibleItemPosition;
-                int offset = dy - ydy;
-                ydy = dy;
-//                Log.d("WQWQ", "offset : " + String.valueOf(offset));
-//                Log.d("WQWQ", "recyclerView.getScrollState() : " + String.valueOf(recyclerView.getScrollState()));
-                boolean shouldRefresh = (linearLayoutManager.findFirstCompletelyVisibleItemPosition() == 0)
-                        && (recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_DRAGGING) && offset > 15;
-                if (shouldRefresh) {
-                    //swipeRefreshLayout.setRefreshing(true);
-                    //Refresh to load data here.
-                    Log.d("WQWQ", "上上");
-                    return;
-                }
-                boolean shouldPullUpRefresh = linearLayoutManager.findLastCompletelyVisibleItemPosition() == linearLayoutManager.getChildCount() - 1
-                        && recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_DRAGGING && offset < -30;
-                if (shouldPullUpRefresh) {
-                    //swipeRefreshLayout.setRefreshing(true);
-                    //refresh to load data here.
-                    Log.d("WQWQ", "下下");
-                    return;
-                }
-                swipeRefreshLayout.setRefreshing(false);
+//                int offset = dy - ydy;
+//                ydy = dy;
+////                Log.d("WQWQ", "offset : " + String.valueOf(offset));
+////                Log.d("WQWQ", "recyclerView.getScrollState() : " + String.valueOf(recyclerView.getScrollState()));
+//                boolean shouldRefresh = (linearLayoutManager.findFirstCompletelyVisibleItemPosition() == 0)
+//                        && (recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_DRAGGING) && offset > 15;
+//                if (shouldRefresh) {
+//                    //swipeRefreshLayout.setRefreshing(true);
+//                    //Refresh to load data here.
+//                    Log.d("WQWQ", "上上");
+//                    return;
+//                }
+//                boolean shouldPullUpRefresh = linearLayoutManager.findLastCompletelyVisibleItemPosition() == linearLayoutManager.getChildCount() - 1
+//                        && recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_DRAGGING && offset < -30;
+//                if (shouldPullUpRefresh) {
+//                    //swipeRefreshLayout.setRefreshing(true);
+//                    //refresh to load data here.
+//                    Log.d("WQWQ", "下下");
+//                    return;
+//                }
+//                swipeRefreshLayout.setRefreshing(false);
 
-                visibleItemCount = recyclerView.getChildCount();
+//                visibleItemCount = recyclerView.getChildCount();
                 totalItemCount = linearLayoutManager.getItemCount();
-                firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
+//                firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
                 lastCompletelyVisibleItemPosition = linearLayoutManager.findLastCompletelyVisibleItemPosition();
-//                if ((visibleItemCount + firstVisibleItem) == totalItemCount){
-                    Log.d("WQWQ", "lastCompletelyVisibleItemPosition : " + String.valueOf(lastCompletelyVisibleItemPosition));
+//                if ((totalItemCount - lastCompletelyVisibleItemPosition) <= 3){
+//                    Log.d("WQWQ", "lastCompletelyVisibleItemPosition : " + String.valueOf(lastCompletelyVisibleItemPosition));
+//                    Log.d("WQWQ", "recyclerView.getScrollState() : " + String.valueOf(recyclerView.getScrollState()));
 //                }
             }
         });
