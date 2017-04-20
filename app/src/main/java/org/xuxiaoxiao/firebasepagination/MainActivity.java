@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wilddog.client.ChildEventListener;
 import com.wilddog.client.DataSnapshot;
@@ -35,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private Query query;
     private ChildEventListener childEventListener;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private int adjustVariable = 21;
+    private int adjustVariable = 15;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,13 +54,7 @@ public class MainActivity extends AppCompatActivity {
         pageDown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String lastkey = arrayList.get(arrayList.size() - 1).getMessageID();
-                arrayList.clear();
-//                Log.d("WQWQ", lastkey + "__lastKey");
-//                Log.d("WQWQ", "+-+-+-+-+-+-+-+-+-+-+");
-                query.removeEventListener(childEventListener);
-                query = mWilddogRef.orderByKey().startAt(lastkey).limitToFirst(adjustVariable);
-                query.addChildEventListener(childEventListener);
+                pageDown();
             }
         });
 
@@ -126,6 +121,27 @@ public class MainActivity extends AppCompatActivity {
         query.addChildEventListener(childEventListener);
     }
 
+    private void pageDown() {
+        Toast.makeText(this, "newItem", Toast.LENGTH_SHORT).show();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                swipeRefreshLayout.setRefreshing(false);
+                String lastkey = arrayList.get(arrayList.size() - 1).getMessageID();
+                arrayList.clear();
+//                Log.d("WQWQ", lastkey + "__lastKey");
+//                Log.d("WQWQ", "+-+-+-+-+-+-+-+-+-+-+");
+                query.removeEventListener(childEventListener);
+                query = mWilddogRef.orderByKey().startAt(lastkey).limitToFirst(adjustVariable);
+                query.addChildEventListener(childEventListener);
+
+            }
+        }, 1000);
+
+
+    }
+
     private void pageUp() {
         String lastkey = arrayList.get(0).getMessageID();
         arrayList.clear();
@@ -156,9 +172,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                if((totalItemCount - lastCompletelyVisibleItemPosition) == 1){
-                    if(i++ == 3){
-                        Log.d("WQWQ","可以了");
+                if ((totalItemCount - lastCompletelyVisibleItemPosition) == 1) {
+                    if (i++ == 2) {
+                        Log.d("WQWQ", "可以了");
+                        pageDown();
+                        i = 0;
                     }
                     return;
                 }
