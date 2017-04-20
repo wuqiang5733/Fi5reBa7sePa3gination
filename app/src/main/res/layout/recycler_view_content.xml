@@ -10,14 +10,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:textSize="18sp"
+        android:textSize="28sp"
         android:text="Text" />
     <TextView
         android:id="@+id/id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:textSize="18sp"
+        android:textSize="38sp"
         android:text="Text" />
 
 </LinearLayout>

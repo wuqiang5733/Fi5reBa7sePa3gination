@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private Query query;
     private ChildEventListener childEventListener;
     private SwipeRefreshLayout swipeRefreshLayout;
-
+    private int adjustVariable = 21;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,10 +55,10 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String lastkey = arrayList.get(arrayList.size()-1).getMessageID();
                 arrayList.clear();
-                Log.d("WQWQ", lastkey + "__lastKey");
-                Log.d("WQWQ", "+-+-+-+-+-+-+-+-+-+-+");
+//                Log.d("WQWQ", lastkey + "__lastKey");
+//                Log.d("WQWQ", "+-+-+-+-+-+-+-+-+-+-+");
                 query.removeEventListener(childEventListener);
-                query = mWilddogRef.orderByKey().startAt(lastkey).limitToFirst(11);
+                query = mWilddogRef.orderByKey().startAt(lastkey).limitToFirst(adjustVariable);
                 query.addChildEventListener(childEventListener);
             }
         });
@@ -90,14 +90,14 @@ public class MainActivity extends AppCompatActivity {
         WilddogOptions wilddogOptions = new WilddogOptions.Builder().setSyncUrl("https://xuxiaoxiao1314.wilddogio.com").build();
         wilddogApp = WilddogApp.initializeApp(this, wilddogOptions);
         mWilddogRef = WilddogSync.getInstance().getReference().child("chat");
-        query = mWilddogRef.limitToLast(11);
+        query = mWilddogRef.limitToLast(adjustVariable);
         childEventListener = new ChildEventListener() {
 
             @Override
             public void onChildAdded(DataSnapshot snapshot, String previousChildName) {
                 ChatMessage chatMessage = (ChatMessage) snapshot.getValue(ChatMessage.class);
                 String string = chatMessage.getMessageID();
-                Log.d("WQWQ", string);
+//                Log.d("WQWQ", string);
                 arrayList.add(chatMessage);
 //                Log.d("WQWQ", String.valueOf(arrayList.size()));
                 contentAdapter.notifyDataSetChanged();
@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
 //                Log.d("WQWQ", lastkey + "__lastKey");
 //                Log.d("WQWQ", "+-+-+-+-+-+-+-+-+-+-+");
         query.removeEventListener(childEventListener);
-        query = mWilddogRef.orderByKey().endAt(lastkey).limitToLast(11);
+        query = mWilddogRef.orderByKey().endAt(lastkey).limitToLast(adjustVariable);
         query.addChildEventListener(childEventListener);
     }
 
@@ -150,8 +150,9 @@ public class MainActivity extends AppCompatActivity {
         contentAdapter = new ContentAdapter(arrayList);
         recyclerView.setAdapter(contentAdapter);
         recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-            boolean isShowTop = false;
-            boolean isShowBottom = false;
+            int firstVisibleItem, visibleItemCount, totalItemCount;
+            int visibleThreshold = 1;
+            boolean isMoreLoading = false;
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
@@ -160,23 +161,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                if (linearLayoutManager.findLastCompletelyVisibleItemPosition() == 99){
-                    if (!isShowTop){
-                        Log.d("WQWQ","已经到底了");
-                    }
-                    isShowTop = true;
-                }else {
-                    isShowTop = false;
-                }
+                visibleItemCount = recyclerView.getChildCount();
+                totalItemCount = linearLayoutManager.getItemCount();
+                firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
 
-                if (linearLayoutManager.findFirstCompletelyVisibleItemPosition() == 0){
-                    if (!isShowBottom){
-                        Log.d("WQWQ","已经到顶了");
-                    }
-                    isShowBottom = true;
-                }else {
-                    isShowBottom = false;
-                }
+                        Log.d("WQWQ","visibleItemCount？" + String.valueOf(visibleItemCount));
+                        Log.d("WQWQ","totalItemCount？" + String.valueOf(totalItemCount));
+                        Log.d("WQWQ","firstVisibleItem？" + String.valueOf(firstVisibleItem));
+                        Log.d("WQWQ","====================================");
+
+                    isMoreLoading = true;
+
             }
         });
     }
@@ -199,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
         public void onBindViewHolder(ContentViewHolder holder, int position) {
             holder.messageTextView.setText(arrayList.get(position + 1).getMessage());
             holder.messageId.setText(arrayList.get(position+1).getMessageID());
-            Log.d("WQWQ",String.valueOf(position));
+//            Log.d("WQWQ",String.valueOf(position));
         }
 
         @Override
