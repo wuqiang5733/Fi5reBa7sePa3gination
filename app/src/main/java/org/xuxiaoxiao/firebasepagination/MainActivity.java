@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private SyncReference mWilddogRef;
     ContentAdapter contentAdapter;
     Button pageUp;
+    Button pageDown;
     private ArrayList<ChatMessage> arrayList = new ArrayList<>();
     private Query query;
     private ChildEventListener childEventListener;
@@ -42,18 +43,32 @@ public class MainActivity extends AppCompatActivity {
                 String lastkey = arrayList.get(0).getMessageID();
                 arrayList.clear();
                 Log.d("WQWQ", lastkey + "__lastKey");
+                Log.d("WQWQ", "+-+-+-+-+-+-+-+-+-+-+");
                 query.removeEventListener(childEventListener);
-                query = mWilddogRef.orderByKey().endAt(lastkey).limitToLast(5);
+                query = mWilddogRef.orderByKey().endAt(lastkey).limitToLast(6);
                 query.addChildEventListener(childEventListener);
 
             }
         });
-
+        pageDown = (Button) findViewById(R.id.page_down);
+        pageDown.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String lastkey = arrayList.get(5).getMessageID();
+                arrayList.clear();
+                Log.d("WQWQ", lastkey + "__lastKey");
+                Log.d("WQWQ", "+-+-+-+-+-+-+-+-+-+-+");
+                query.removeEventListener(childEventListener);
+                query = mWilddogRef.orderByKey().startAt(lastkey).limitToFirst(6);
+                query.addChildEventListener(childEventListener);
+            }
+        });
         WilddogOptions wilddogOptions = new WilddogOptions.Builder().setSyncUrl("https://xuxiaoxiao1314.wilddogio.com").build();
         wilddogApp = WilddogApp.initializeApp(this, wilddogOptions);
         mWilddogRef = WilddogSync.getInstance().getReference().child("chat");
-        query = mWilddogRef.limitToLast(5);
+        query = mWilddogRef.limitToLast(6);
         childEventListener = new ChildEventListener() {
+
             @Override
             public void onChildAdded(DataSnapshot snapshot, String previousChildName) {
                 ChatMessage chatMessage = (ChatMessage) snapshot.getValue(ChatMessage.class);
@@ -113,13 +128,13 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(ContentViewHolder holder, int position) {
-            holder.messageTextView.setText(arrayList.get(position).getMessage());
+            holder.messageTextView.setText(arrayList.get(position + 1).getMessage());
         }
 
         @Override
         public int getItemCount() {
 //            Log.d("WQWQ", String.valueOf(arrayList.size() + "getItemCount"));
-            return arrayList.size();
+            return arrayList.size() - 1;
         }
     }
 
