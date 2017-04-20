@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
                             pageUp();
 
                         }
-                    },1200);
+                    },1000);
                 }
             });
             swipeRefreshLayout.setColorSchemeColors(
@@ -141,13 +141,44 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
 //        recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         Drawable divider = getResources().getDrawable(R.drawable.item_divider);
 
         recyclerView.addItemDecoration(new HorizontalDividerItemDecoration(divider));
         contentAdapter = new ContentAdapter(arrayList);
         recyclerView.setAdapter(contentAdapter);
+        recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            boolean isShowTop = false;
+            boolean isShowBottom = false;
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (linearLayoutManager.findLastCompletelyVisibleItemPosition() == 99){
+                    if (!isShowTop){
+                        Log.d("WQWQ","已经到底了");
+                    }
+                    isShowTop = true;
+                }else {
+                    isShowTop = false;
+                }
+
+                if (linearLayoutManager.findFirstCompletelyVisibleItemPosition() == 0){
+                    if (!isShowBottom){
+                        Log.d("WQWQ","已经到顶了");
+                    }
+                    isShowBottom = true;
+                }else {
+                    isShowBottom = false;
+                }
+            }
+        });
     }
 
     private class ContentAdapter extends RecyclerView.Adapter<ContentViewHolder> {
